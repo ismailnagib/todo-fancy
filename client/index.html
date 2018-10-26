@@ -135,6 +135,9 @@
                     } else {
                         show()
                     }
+                    $('#email').val('')
+                    $('#password').val('')
+                    $('#logNotice').text()
                 })
                 .catch(err => {
                     $('#logNotice').text(err.responseJSON.message)
@@ -152,6 +155,9 @@
                 .then(data => {
                     $('#logNotice').text(data.message)
                     $('#logNotice').css('color', 'green')
+                    $('#newname').val('')
+                    $('#newemail').val('')
+                    $('#newpassword').val('')
                     signinSection()
                 })
                 .catch(err => {
@@ -185,6 +191,10 @@
                 $('#form-signup-btn').removeClass('logActive')
                 $('#signinSection').show()
                 $('#signupSection').hide()
+                $('#newname').val('')
+                $('#newemail').val('')
+                $('#newpassword').val('')
+                $('#logNotice').text()
             }
 
             function signupSection() {
@@ -192,6 +202,9 @@
                 $('#form-signup-btn').addClass('logActive')
                 $('#signinSection').hide()
                 $('#signupSection').show()
+                $('#email').val('')
+                $('#password').val('')
+                $('#logNotice').text()
             }
 
             function logOut() {
