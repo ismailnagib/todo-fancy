@@ -64,7 +64,8 @@ module.exports = {
                 res.status(500).json({message: err})
             })
         })
-        .catch(err => {
+        .catch(err => {let token = jwt.sign({id: user._id}, process.env.JWT_KEY)
+        res.status(200).json({token: token})
             res.status(500).json({message: err})
         })
     },
@@ -83,13 +84,13 @@ module.exports = {
                             let token = jwt.sign({id: user._id}, process.env.JWT_KEY);
                             res.status(200).json({token: token})
                         } else {
-                            res.status(500).json({message: 'Wrong password'})
+                            res.status(500).json({message: 'Incorrect email and/or password'})
                         }
                     } else {
                         res.status(500).json({message: 'Sorry, but you should sign in with Google'})
                     }
                 } else {
-                    res.status(500).json({message: 'The email is unregistered'})
+                    res.status(500).json({message: 'Incorrect email and/or password'})
                 }
             })
         }

@@ -43,122 +43,63 @@ module.exports = {
     },
 
     showImportance: function(req, res) {
-        var result = [];
-        if (req.params.state === 'a') {
-            if (req.params.dir === 'asc') {
-                listModel.find({
-                    userId: req.userId,
-                    importance: 'Very Important'
-                })
-                .then(data => {
-                    listModel.find({
-                        userId: req.userId,
-                        importance: 'Important'
-                    })
-                    .then(data2 => {
-                        listModel.find({
-                            userId: req.userId,
-                            importance: 'Unimportant'
-                        })
-                        .then(data3 => {
-                            result.push(data, data2, data3)
-                            res.status(200).json({tasks: result})
-                        })
-                    })
-                })
-                .catch(err => {
-                    res.status(500).json({message: err.message})
-                })
-            } else if (req.params.dir === 'desc') {
-                listModel.find({
-                    userId: req.userId,
-                    importance: 'Unimportant'
-                })
-                .then(data => {
-                    listModel.find({
-                        userId: req.userId,
-                        importance: 'Important'
-                    })
-                    .then(data2 => {
-                        listModel.find({
-                            userId: req.userId,
-                            importance: 'Very Important'
-                        })
-                        .then(data3 => {
-                            result.push(data, data2, data3)
-                            res.status(200).json({tasks: result})
-                        })
-                    })
-                })
-                .catch(err => {
-                    res.status(500).json({message: err.message})
-                })
-            }
+        let result = []
+
+        let order = []
+        if (req.params.dir === 'asc') {
+            order = ['Very Important', 'Unimportant']
         } else {
-            let month = String(new Date().getMonth() + 1)
+            order = ['Unimportant', 'Very Important']
+        }
+
+        let findObj = [{
+            userId: req.userId,
+            importance: order[0]
+        }, {
+            userId: req.userId,
+            importance: 'Important'
+        }, {
+            userId: req.userId,
+            importance: order[1]
+        }]
+
+        let month = ''
+        let day = ''
+
+        if (req.params.state === 't') {
+            month = String(new Date().getMonth() + 1)
             if (month.length === 1) {
                 month = '0' + month
             }
-            let day = String(new Date().getDate())
+
+            day = String(new Date().getDate())
             if (day.length === 1) {
                 day = '0' + day
             }
-            if (req.params.dir === 'asc') {
-                listModel.find({
-                    userId: req.userId,
-                    importance: 'Very Important',
-                    dueDate: new Date().getFullYear() + '-' + month + '-' + day + ' 00:00:00.000Z'
-                })
-                .then(data => {
-                    listModel.find({
-                        userId: req.userId,
-                        importance: 'Important',
-                        dueDate: new Date().getFullYear() + '-' + month + '-' + day + ' 00:00:00.000Z'
-                    })
-                    .then(data2 => {
-                        listModel.find({
-                            userId: req.userId,
-                            importance: 'Unimportant',
-                            dueDate: new Date().getFullYear() + '-' + month + '-' + day + ' 00:00:00.000Z'
-                        })
-                        .then(data3 => {
-                            result.push(data, data2, data3)
-                            res.status(200).json({tasks: result})
-                        })
-                    })
-                })
-                .catch(err => {
-                    res.status(500).json({message: err.message})
-                })
-            } else if (req.params.dir === 'desc') {
-                listModel.find({
-                    userId: req.userId,
-                    importance: 'Unimportant',
-                    dueDate: new Date().getFullYear() + '-' + month + '-' + day + ' 00:00:00.000Z'
-                })
-                .then(data => {
-                    listModel.find({
-                        userId: req.userId,
-                        importance: 'Important',
-                        dueDate: new Date().getFullYear() + '-' + month + '-' + day + ' 00:00:00.000Z'
-                    })
-                    .then(data2 => {
-                        listModel.find({
-                            userId: req.userId,
-                            importance: 'Very Important',
-                            dueDate: new Date().getFullYear() + '-' + month + '-' + day + ' 00:00:00.000Z'
-                        })
-                        .then(data3 => {
-                            result.push(data, data2, data3)
-                            res.status(200).json({tasks: result})
-                        })
-                    })
-                })
-                .catch(err => {
-                    res.status(500).json({message: err.message})
-                })
-            }
         }
+
+        for (let i = 0; i < findObj.length; i++) {
+            if (req.params.state === 't') {
+                findObj[i].dueDate = new Date().getFullYear() + '-' + month + '-' + day + ' 00:00:00.000Z'
+            }
+            result[i] = new Promise((resolve, reject) => {
+                listModel.find(findObj[i])
+                .then(data => {
+                    resolve(data)
+                })
+                .catch(err => {
+                    reject(err)
+                })
+            })
+        }
+
+        Promise.all(result)
+        .then(tasks => {
+            res.status(200).json({tasks: tasks})
+        })
+        .catch(err => {
+            res.status(500).json({message: err.message})
+        })
     },
 
     showSorted: function(req, res) {

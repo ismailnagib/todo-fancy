@@ -197,9 +197,7 @@
             function logOut() {
                 if (localStorage.getItem('lgnMtd') === 'g') {
                     var auth2 = gapi.auth2.getAuthInstance();
-                    auth2.signOut().then(function () {
-                        console.log('User signed out.');
-                    });
+                    auth2.signOut()
                 }
                 localStorage.clear()
                 show()
@@ -262,7 +260,6 @@
             }
 
             function list(tasks) {
-                console.log('A')
                 let counter = 0
                 $('#list').text("")
                 tasks.forEach(task => {
